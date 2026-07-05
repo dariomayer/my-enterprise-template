@@ -19,7 +19,7 @@ COPY apps/api ./apps/api
 # Build shared and api
 RUN pnpm -r build
 
-# Production image
+# ── Production image ─────────────────────────────────────────────────
 FROM node:20-alpine
 
 WORKDIR /app
@@ -38,6 +38,12 @@ RUN pnpm install --prod --frozen-lockfile
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+
+# Security: run as non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -S appuser -u 1001 -G appgroup && \
+    chown -R appuser:appgroup /app
+USER appuser
 
 EXPOSE 3000
 

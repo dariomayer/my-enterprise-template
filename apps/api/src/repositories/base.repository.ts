@@ -1,11 +1,16 @@
-// This is a stub for the BaseRepository pattern
-// In a real implementation, this would wrap PrismaClient calls
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../config/database';
 
-export const prisma = new PrismaClient();
-
+/**
+ * Abstract Base Repository implementing the Repository Pattern.
+ * All entity-specific repositories must extend this class.
+ *
+ * This layer decouples business logic (services) from the ORM (Prisma),
+ * making it possible to swap database engines without touching service code.
+ */
 export abstract class BaseRepository<T> {
-  // Abstract methods for common CRUD operations
+  protected db = prisma;
+
+  abstract findAll(): Promise<T[]>;
   abstract findById(id: string): Promise<T | null>;
   abstract create(data: Partial<T>): Promise<T>;
   abstract update(id: string, data: Partial<T>): Promise<T>;

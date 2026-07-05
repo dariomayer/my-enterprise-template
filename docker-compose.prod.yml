@@ -3,8 +3,8 @@ version: '3.8'
 services:
   web:
     build:
-      context: ./apps/web
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: apps/web/Dockerfile
     ports:
       - "80:80"
     restart: always
@@ -19,7 +19,9 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:password@db:5432/enterprise_prod
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-password}@db:5432/enterprise_prod
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGIN=${CORS_ORIGIN:-https://yourdomain.com}
       - PORT=3000
     restart: always
     depends_on:
@@ -29,8 +31,11 @@ services:
     image: postgres:15-alpine
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
       POSTGRES_DB: enterprise_prod
+    # Security: NO ports exposed to the host — only reachable from the api service
+    # ports:
+    #   - "5432:5432"
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     restart: always

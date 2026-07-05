@@ -15,9 +15,21 @@ COPY apps/web ./apps/web
 
 RUN pnpm -r build
 
-# Production server using nginx
+# ── Production image ─────────────────────────────────────────────────
 FROM nginx:alpine
+
+# Security: remove default nginx content and run as non-root
+RUN rm -rf /usr/share/nginx/html/*
+
 COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Security: nginx runs as non-root where possible
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chown -R nginx:nginx /var/cache/nginx && \
+    chown -R nginx:nginx /var/log/nginx && \
+    touch /var/run/nginx.pid && chown nginx:nginx /var/run/nginx.pid
+
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]

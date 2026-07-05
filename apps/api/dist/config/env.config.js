@@ -11,7 +11,10 @@ const envSchema = zod_1.z.object({
     NODE_ENV: zod_1.z.enum(['development', 'production', 'test']).default('development'),
     PORT: zod_1.z.string().default('3000'),
     DATABASE_URL: zod_1.z.string().url(),
-    JWT_SECRET: zod_1.z.string().min(32).default('super-secret-jwt-key-replace-in-prod'),
+    // JWT_SECRET is REQUIRED in production — no default to prevent insecure deployments
+    JWT_SECRET: zod_1.z.string().min(32),
+    // CORS whitelist (comma-separated origins, e.g. "https://example.com,https://app.example.com")
+    CORS_ORIGIN: zod_1.z.string().default('http://localhost:5173'),
 });
 const _env = envSchema.safeParse(process.env);
 if (!_env.success) {

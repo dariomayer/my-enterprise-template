@@ -1,10 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseRepository = exports.prisma = void 0;
-// This is a stub for the BaseRepository pattern
-// In a real implementation, this would wrap PrismaClient calls
-const client_1 = require("@prisma/client");
-exports.prisma = new client_1.PrismaClient();
+exports.BaseRepository = void 0;
+const database_1 = require("../config/database");
+/**
+ * Abstract Base Repository implementing the Repository Pattern.
+ * All entity-specific repositories must extend this class.
+ *
+ * This layer decouples business logic (services) from the ORM (Prisma),
+ * making it possible to swap database engines without touching service code.
+ */
 class BaseRepository {
+    db = database_1.prisma;
 }
 exports.BaseRepository = BaseRepository;
